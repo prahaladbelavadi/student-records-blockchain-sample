@@ -10,7 +10,7 @@ from flask import Flask, jsonify, request
 
 class Blockchain:
     def __init__(self):
-        self.current_transactions = []
+        self.current_collegeClasss = []
         self.chain = []
         self.nodes = set()
 
@@ -109,30 +109,30 @@ class Blockchain:
         block = {
             'index': len(self.chain) + 1,
             'timestamp': time(),
-            'transactions': self.current_transactions,
+            'collegeClasss': self.current_collegeClasss,
             'proof': proof,
             'previous_hash': previous_hash or self.hash(self.chain[-1]),
         }
 
-        # Reset the current list of transactions
-        self.current_transactions = []
+        # Reset the current list of collegeClasss
+        self.current_collegeClasss = []
 
         self.chain.append(block)
         return block
 
-    def new_transaction(self, sender, recipient, amount):
+    def new_collegeClass(self, sender, recipient, nuStudents):
         """
-        Creates a new transaction to go into the next mined Block
+        Creates a new collegeClass to go into the next mined Block
 
         :param sender: Address of the Sender
         :param recipient: Address of the Recipient
-        :param amount: Amount
-        :return: The index of the Block that will hold this transaction
+        :param nuStudents: nuStudents
+        :return: The index of the Block that will hold this collegeClass
         """
-        self.current_transactions.append({
+        self.current_collegeClasss.append({
             'sender': sender,
             'recipient': recipient,
-            'amount': amount,
+            'nuStudents': nuStudents,
         })
 
         return self.last_block['index'] + 1
@@ -159,7 +159,7 @@ class Blockchain:
 
          - Find a number p' such that hash(pp') contains leading 4 zeroes
          - Where p is the previous proof, and p' is the new proof
-         
+
         :param last_block: <dict> last Block
         :return: <int>
         """
@@ -208,10 +208,10 @@ def mine():
 
     # We must receive a reward for finding the proof.
     # The sender is "0" to signify that this node has mined a new coin.
-    blockchain.new_transaction(
+    blockchain.new_collegeClass(
         sender="0",
         recipient=node_identifier,
-        amount=1,
+        nuStudents=1,
     )
 
     # Forge the new Block by adding it to the chain
@@ -221,26 +221,26 @@ def mine():
     response = {
         'message': "New Block Forged",
         'index': block['index'],
-        'transactions': block['transactions'],
+        'collegeClasss': block['collegeClasss'],
         'proof': block['proof'],
         'previous_hash': block['previous_hash'],
     }
     return jsonify(response), 200
 
 
-@app.route('/transactions/new', methods=['POST'])
-def new_transaction():
+@app.route('/collegeClasss/new', methods=['POST'])
+def new_collegeClass():
     values = request.get_json()
 
     # Check that the required fields are in the POST'ed data
-    required = ['sender', 'recipient', 'amount']
+    required = ['sender', 'recipient', 'nuStudents']
     if not all(k in values for k in required):
         return 'Missing values', 400
 
-    # Create a new Transaction
-    index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
+    # Create a new collegeClass
+    index = blockchain.new_collegeClass(values['sender'], values['recipient'], values['nuStudents'])
 
-    response = {'message': f'Transaction will be added to Block {index}'}
+    response = {'message': f'collegeClass will be added to Block {index}'}
     return jsonify(response), 201
 
 
